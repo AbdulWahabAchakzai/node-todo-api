@@ -8,10 +8,18 @@ var {
     Todo
 } = require('./../models/todo.js');
 
+const todos = [{
+    text: 'First test todo'
+}, {
+    text: 'Second test todo'
+}];
+
 // beforEach allows us to execute code before each test case
 beforeEach((done) => {
-    Todo.remove({}).then(() => done());
-})
+    Todo.remove({}).then(() => {
+        return Todo.insertMany(todos);
+    }).then(() => done());
+});
 
 /* in the below code we assume that there is no todo in database, which is a wrong approach.
 for such case we need to write script to remove all todos from database, which is writen exactly
@@ -35,7 +43,9 @@ describe('P0ST/todos', () => {
                 }
 
                 // testing code for database
-                Todo.find().then((todos) => {
+                Todo.find({
+                    text
+                }).then((todos) => {
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe(text);
                     done();
@@ -54,9 +64,22 @@ describe('P0ST/todos', () => {
                     return done(err);
                 }
                 Todo.find().then(() => {
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
                 }).catch((e) => done(e));
             });
+    });
+});
+
+
+describe('GET/todos', () => {
+    it('Should get all todos', (done) => {
+        request(app)
+            .get('/todos')
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todos.length).toBe(2);
+            })
+            .end(done);
     });
 });
