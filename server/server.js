@@ -17,6 +17,8 @@ var {
 var app = express();
 app.use(bodyParser.json());
 
+var port = process.env.PORT || 3000;
+
 
 app.post('/todos', (req, res) => {
     var todo = new Todo({
@@ -72,6 +74,6 @@ module.exports = {
 };
 
 
-app.listen(3000, () => {
-    console.log('Server started on port 3000');
+app.listen(port, () => {
+    console.log(`Server started on port {port}`);
 })
